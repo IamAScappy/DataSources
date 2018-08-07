@@ -8,7 +8,9 @@
 
 import UIKit
 
-final class SectionUpdater<T: Diffable, A: Updating> {
+import DifferenceKit
+
+final class SectionUpdater<T: Differentiable, A: Updating> {
 
   enum State {
     case idle
@@ -17,7 +19,7 @@ final class SectionUpdater<T: Diffable, A: Updating> {
 
   enum UpdateMode {
     case everything
-    case partial(animated: Bool, isEqual: EqualityChecker<T>)
+    case partial(animated: Bool)
   }
 
   let adapter: A
@@ -48,50 +50,58 @@ final class SectionUpdater<T: Diffable, A: Updating> {
         self.state = .idle
         completion()
       }
-    case .partial(let animated, let isEqual):
+    case .partial(let preferredAnimated):
 
-      let diff = Diff.diffing(
-        oldArray: currentDisplayingItems,
-        newArray: newItems,
-        isEqual: isEqual
-      )
+      let stagedChangeset = StagedChangeset.init(source: currentDisplayingItems, target: newItems)
 
-      guard diff.changeCount > 0 else {
-        completion()
+      let totalChangeCount = stagedChangeset.map { $0.changeCount }.reduce(0, +)
+
+      guard totalChangeCount > 0 else {
         return
       }
 
-      var animated = animated
+      let animated: Bool
 
-      if diff.changeCount > 300 {
+      if totalChangeCount > 300 {
         animated = false
+      } else {
+        animated = preferredAnimated
       }
       
       let _adapter = self.adapter
+      
+      
       
       self.adapter.performBatch(
         animated: animated,
         updates: {
           
-          _adapter.reloadItems(at: diff.updates.map { IndexPath(item: $0, section: targetSection) })
-          _adapter.deleteItems(at: diff.deletes.map { IndexPath(item: $0, section: targetSection) })
-          _adapter.insertItems(at: diff.inserts.map { IndexPath(item: $0, section: targetSection) })
-          
-          for move in diff.moves {
-            _adapter.moveItem(
-              at: IndexPath(item: move.from, section: targetSection),
-              to: IndexPath(item: move.to, section: targetSection)
-            )
+          for changeset in stagedChangeset {
+            
+            _adapter.insertItems(at: changeset.elementInserted.map { IndexPath(item: $0.element, section: targetSection) })
+            _adapter.deleteItems(at: changeset.elementDeleted.map { IndexPath(item: $0.element, section: targetSection) })
+            _adapter.reloadItems(at: changeset.elementUpdated.map { IndexPath(item: $0.element, section: targetSection) })
+            
+            for (source, target) in changeset.elementMoved {
+              _adapter.moveItem(
+                at: IndexPath(item: source.element, section: targetSection),
+                to: IndexPath(item: target.element, section: targetSection)
+              )
+            }
+            
           }
+          
       },
         completion: {
           assertMainThread()
+          
           self.state = .idle
           completion()
+          
       }
       )
-
+      
+      
     }
-
   }
 }

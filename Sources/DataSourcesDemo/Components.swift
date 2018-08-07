@@ -17,24 +17,32 @@ protocol Model {
   var title: String { get }
 }
 
-struct ModelA : Model, Diffable {
+struct ModelA : Model, Differentiable, Equatable {
 
-  var diffIdentifier: AnyHashable {
-    return AnyHashable(identity)
+  var differenceIdentifier: String {
+    return identity
   }
 
   let identity: String
   let title: String
+
+  func isUpdated(from source: ModelA) -> Bool {
+    return self == source
+  }
 }
 
-struct ModelB : Model, Diffable {
+struct ModelB : Model, Differentiable, Equatable {
 
-  var diffIdentifier: AnyHashable {
-    return AnyHashable(identity)
+  var differenceIdentifier: String {
+    return identity
   }
 
   let identity: String
   let title: String
+
+  func isUpdated(from source: ModelB) -> Bool {
+    return self == source
+  }
 }
 
 

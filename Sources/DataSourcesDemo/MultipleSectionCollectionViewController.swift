@@ -30,8 +30,8 @@ final class MultipleSectionCollectionViewController: UIViewController, UICollect
 
   private lazy var _dataSource: DataController<CollectionViewAdapter> = .init(adapter: .init(collectionView: self.collectionView))
 
-  private let section0 = Section(ModelA.self, isEqual: { $0.identity == $1.identity })
-  private let section1 = Section(ModelB.self, isEqual: { $0.identity == $1.identity })
+  private let section0 = Section(ModelA.self)
+  private let section1 = Section(ModelB.self)
 
   private let add = UIBarButtonItem(title: "Add", style: .plain, target: nil, action: nil)
   private let remove = UIBarButtonItem(title: "Remove", style: .plain, target: nil, action: nil)
