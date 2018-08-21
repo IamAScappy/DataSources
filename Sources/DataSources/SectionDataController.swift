@@ -240,9 +240,3 @@ extension SectionDataController where T : AnyObject {
   }
 }
 
-extension SectionDataController where T : Equatable {
-
-  public convenience init(itemType: T.Type? = nil, adapter: A, displayingSection: Int = 0) {
-    self.init(adapter: adapter, displayingSection: displayingSection)
-  }
-}

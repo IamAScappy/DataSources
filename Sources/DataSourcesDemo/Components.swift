@@ -27,7 +27,7 @@ struct ModelA : Model, Differentiable, Equatable {
   let title: String
 
   func isUpdated(from source: ModelA) -> Bool {
-    return self == source
+    return self != source
   }
 }
 
@@ -41,7 +41,7 @@ struct ModelB : Model, Differentiable, Equatable {
   let title: String
 
   func isUpdated(from source: ModelB) -> Bool {
-    return self == source
+    return self != source
   }
 }
 
