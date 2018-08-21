@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'DataSources'
-  s.version = '0.6.0'
+  s.version = '0.7.0'
   s.summary = '💾 🔜📱 Type-safe data-driven List-UI Framework'
   s.homepage = 'https://github.com/muukii/DataSources'
   s.description = '💾 🔜📱 Type-safe data-driven List-UI Framework. (We can also use ASCollectionNode)'
@@ -11,11 +11,10 @@ Pod::Spec.new do |s|
   s.source = { :git => 'https://github.com/muukii/DataSources.git', :tag => s.version.to_s }
 
   s.subspec 'Default' do |cs|
-    # cs.frameworks = 'DataSources/Diff'
-    # cs.dependency 'DataSources/Diff'
-    cs.source_files = ['Sources/ListDiff/**/*.swift', 'Sources/DataSources/**/*.swift']
+    cs.source_files = ['Sources/DataSources/**/*.swift']
   end
 
+  s.dependency 'DifferenceKit/Core'
   s.module_name = s.name
   s.default_subspec = 'Default'
   s.requires_arc = true
