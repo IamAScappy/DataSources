@@ -76,10 +76,18 @@ final class SectionUpdater<T: Differentiable, A: Updating> {
           
           for changeset in stagedChangeset {
             
-            _adapter.insertItems(at: changeset.elementInserted.map { IndexPath(item: $0.element, section: targetSection) })
-            _adapter.deleteItems(at: changeset.elementDeleted.map { IndexPath(item: $0.element, section: targetSection) })
-            _adapter.reloadItems(at: changeset.elementUpdated.map { IndexPath(item: $0.element, section: targetSection) })
-            
+            if !changeset.elementDeleted.isEmpty {
+              _adapter.deleteItems(at: changeset.elementDeleted.map { IndexPath(item: $0.element, section: targetSection) })
+            }
+
+            if !changeset.elementInserted.isEmpty {
+              _adapter.insertItems(at: changeset.elementInserted.map { IndexPath(item: $0.element, section: targetSection) })
+            }
+
+            if !changeset.elementUpdated.isEmpty {
+              _adapter.reloadItems(at: changeset.elementUpdated.map { IndexPath(item: $0.element, section: targetSection) })
+            }
+
             for (source, target) in changeset.elementMoved {
               _adapter.moveItem(
                 at: IndexPath(item: source.element, section: targetSection),
