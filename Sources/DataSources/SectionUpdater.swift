@@ -70,15 +70,11 @@ final class SectionUpdater<T: Differentiable, A: Updating> {
       
       let _adapter = self.adapter
 
-      let g = DispatchGroup()
-
-      for changeset in stagedChangeset {
-
-        g.enter()
-
-        self.adapter.performBatch(
-          animated: animated,
-          updates: {
+      self.adapter.performBatch(
+        animated: animated,
+        updates: {
+          
+          for changeset in stagedChangeset {
             
             _adapter.insertItems(at: changeset.elementInserted.map { IndexPath(item: $0.element, section: targetSection) })
             _adapter.deleteItems(at: changeset.elementDeleted.map { IndexPath(item: $0.element, section: targetSection) })
@@ -90,17 +86,16 @@ final class SectionUpdater<T: Differentiable, A: Updating> {
                 to: IndexPath(item: target.element, section: targetSection)
               )
             }
-        },
-          completion: {
-            assertMainThread()
-            g.leave()
-        })
-      }
-
-      g.notify(queue: .main) {
-        self.state = .idle
-        completion()
-      }
+            
+          }
+          
+      },
+        completion: {
+          assertMainThread()
+          
+          self.state = .idle
+          completion()
+      })
 
     }
   }
